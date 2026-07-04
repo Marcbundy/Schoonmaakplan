@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, shrink-to-fit=no, viewport-fit=cover">
+<meta name="theme-color" content="#1d5b42">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Schoonmaakplan">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%231d5b42'/><text x='90' y='115' font-size='90' text-anchor='middle' fill='white' font-family='-apple-system,sans-serif'>🧽</text></svg>">
+<title>Schoonmaakplan GTE-D-09-99</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<!-- Firebase SDK: app, auth, firestore (compat = traditional global namespace) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<!-- Type: General Sans (sans) + JetBrains Mono (codes/numbers). Loaded
+     async via Fontshare/Google Fonts; system fallbacks in --f-sans / --f-mono
+     keep the app readable while the webfont is loading. -->
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20260616110526">
+</head>
+<body>
+
+<!-- Live region for screen reader announcements -->
+<div id="sr-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+<!-- Onboarding-banner mount-point (gevuld door renderApp/renderOnboardingBanner) -->
+<div id="onboarding-mount"></div>
+
+<header class="app-header">
+  <div class="header-row">
+    <div class="brand">
+      <img class="brand-logo" src="data:image/png;base64,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sLuVUTYrqLtbPv2HntbZT37u5y1yy/LBYekxOYl9MfdHMgIB6bRkHOTR/nyh7chPzX7PL29mSEI2S/tII38LCwsLi31dwZpK9q6/c3rpr074Tkuw6W1Dw54MICBmSJLSRI/ADAlI0ZoWlA9SHjfO+frWwy77z0Nfc97WsP43dlyVhYWFhYXF9CYNaSULJND/zZf/Wyq3vssJCpT3hA+aWUlLI1oVDEIgWLrNDQJ5mQI1dPysPOdln29b8a3VwEgHK8s+FhYWFhZ7RcEqhUXoAlE35PYfvf1VjTsf+mqj7DsqVwgQQPiYAdnBDDAYEmCkHHYakg7ysqHMDbN+Xmo//Muz3vHTu4Ag7IPcydK2p7OwsLCw2OsKVkP1FvYfe+yxpgPvvvAzieFNF6Ux3JwrSq1o92h9626lSswO4GaSBHJc5GTDJk7P7vFmnfjtWZ03rAECcBYCyMKetVpYWFhYzDgFC5ihVcLW/7vk0MzWOy6l4vZ3NjrF5nIpQMGHRNjfVgD1G4C+W6HqeZrMIiFYNCYJcFwMl5N5TqRvR2bB/+449L2/PviM9/UDsIrVwsLCwmLfULCAChmrUXSAwOaff+rg5i1/fReGd7wjQcWjksKD5wUo+UDAFIBId3smHtu4eYwWBYFJNX1X/wtmOEnBlHIJwhUI2EVBJvvgJu8MMvv9nmcf/Zv2N399gx4xGI7Ey7JVrBYWFhYW+4yC3a0Ls1mBpd0UKlrgAebE4p+8bbnbt+71QSn3agSlo5oTfpIoCOtkAoYvgUACcrfqHJm5TQAcQRDEcAXBcSgMOrNA0Xfgw90h3fQTSDTciYbZf6bF59zfctqntuuGUZyFwNJOQmevbdJvYWFhYbHvKliNbDYrutAt9Dg6AICTQn/vBYdy39rjhdd/DJcLSyjwDgL7cyGDFkloJhkwB55LJCQ7LhMJyZJz5LiDJMQ2wPk7Jxs3cCK1Nki0P+Ee8dp1bade0Qej50UYAl4ugNOl9VYtLCwsLF5UCna3sgMIPZ0Ca3pplLLdvUwX69aVU42PfaapKVls5b5N7G17IMHUJlOLjpecmSspoIHWN35hmChRxsis9tH3yMLB0k5GZ4/NBrawsLCwePEr2DEKN5sVWLqWsKaXsBaMXkiqsqkDA4ROCCwBAcvRu3Qud9rQr4WFhYWFVbAVFCer9XZlCeg2/iUb/tHVzYDqiWxhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYfHix/8H1QVGioXvtWcAAAAASUVORK5CYII=" alt="Huis van Bakkers">
+      <div class="brand-text">
+        <div class="brand-title">
+          <h1 id="app-title">Schoonmaakplan</h1>
+          <span class="brand-code" id="app-version-code"></span>
+        </div>
+        <div class="subtitle" id="app-subtitle"><span id="app-subtitle-text">GTE-D-09-99 · versie 10 (vanaf week 20 / 2026)</span></div>
+      </div>
+    </div>
+    <!-- Header stats: today done / overdue / week-progress. Populated by renderHeaderStats(). -->
+    <div class="header-stats" id="header-stats"></div>
+    <div class="header-right">
+      <button class="btn icon-btn" onclick="openUpdateModal()" id="update-btn" style="display:none;">⟳ Update</button>
+      <select class="btn icon-btn lang-select" id="lang-select" onchange="setLanguage(this.value)" aria-label="Taal / Language" title="Taal / Language">
+        <option value="nl">🌐 NL</option>
+        <option value="en">🌐 EN</option>
+        <option value="pl">🌐 PL</option>
+        <option value="ro">🌐 RO</option>
+      </select>
+      <button class="btn icon-btn" onclick="toggleDarkMode()" id="dark-mode-btn" title="Donkere modus" aria-label="Donkere modus">🌙</button>
+      <span class="sync-pill disconnected" id="cloud-status">⚠ Lokaal</span>
+      <button class="user-pill" onclick="openUserModal()" id="user-btn" title="Wie ben je?">
+        <span class="avatar" id="user-avatar">?</span>
+        <span class="user-name" id="user-name-label">Gebruiker</span>
+      </button>
+      <button class="btn icon-btn" onclick="toggleSidebar()" id="menu-btn" title="Menu" aria-label="Menu">⋮</button>
+      <input type="file" id="import-file-input" accept=".xlsx,.xls" style="display:none" onchange="handleImportFile(event)">
+      <input type="file" id="restore-file-input" accept=".json" style="display:none" onchange="handleRestoreFile(event)">
+    </div>
+  </div>
+</header>
+
+<!-- SIDEBAR — slide-in menu replacing the cluttered header buttons. Items
+     inside are role-filtered: every user sees Help / Profile / Dashboard /
+     Versiebeheer / QR / Export Excel; admins additionally see Edit / Import /
+     Backup / Restore; super-users additionally see Account-management. -->
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar" aria-hidden="true">
+  <div class="sidebar-header">
+    <h2 id="sidebar-title">Menu</h2>
+    <button class="sidebar-close" onclick="closeSidebar()" aria-label="Sluiten">×</button>
+  </div>
+  <div class="sidebar-body" id="sidebar-body"><!-- populated by renderSidebar() --></div>
+</aside>
+
+<div id="plan-tabs" class="plan-tabs-bar"></div>
+
+<div class="tabs" id="tabs"></div>
+
+<div id="view-container">
+  <div id="edit-mode-banner" class="edit-mode-banner" role="status">
+    <span id="edit-mode-banner-text" class="edit-mode-banner-text">✏️ Wijzigingsmodus actief — je kunt taken bewerken, toevoegen of verwijderen</span>
+    <button class="edit-mode-banner-close" onclick="toggleEditMode()" id="edit-mode-banner-btn">Wijzigen uitschakelen</button>
+  </div>
+  <div id="filters-and-content"></div>
+</div>
+
+<!-- PASSWORD MODAL — replaces browser prompt() for entering the edit password -->
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="password-modal" onclick="if(event.target===this) closePasswordModal()">
+  <div class="modal" style="max-width: 400px;">
+    <div class="modal-header">
+      <div>
+        <h2 id="password-modal-title">🔒 Wijzigen ontgrendelen</h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="password-modal-subtitle">Voer het wachtwoord in om taken te kunnen bewerken</div>
+      </div>
+      <button class="close" onclick="closePasswordModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="password-modal-input" id="password-modal-label" style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 6px;">Wachtwoord</label>
+        <div class="password-input-wrapper">
+          <input type="password" id="password-modal-input"
+            autocomplete="current-password"
+            placeholder="••••••••"
+            style="padding-right: 44px;"
+            onkeydown="if(event.key==='Enter') submitPasswordModal(); if(event.key==='Escape') closePasswordModal();">
+          <button class="password-toggle-btn" id="password-toggle-btn" onclick="togglePasswordVisibility()" tabindex="-1" title="Toon/verberg wachtwoord">👁</button>
+        </div>
+        <div class="password-modal-error" id="password-modal-error" style="display:none;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closePasswordModal()" id="password-cancel-btn">Annuleren</button>
+      <button class="btn-save" onclick="submitPasswordModal()" id="password-submit-btn">Ontgrendelen</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="msds-modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h2 id="msds-title">Product</h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="msds-subtitle">MSDS / Veiligheidsinformatie</div>
+      </div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="msds-body"></div>
+  </div>
+</div>
+
+<!-- KEURING-MODAL — toevoegen/bewerken van een jaarlijkse keuring. Labels en
+     knop-teksten worden door openInspectionModal() in de juiste taal gezet. -->
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="inspection-modal" onclick="if(event.target===this) closeInspectionModal()">
+  <div class="modal" style="max-width: 520px;">
+    <div class="modal-header">
+      <div>
+        <h2 id="inspection-modal-title">Keuring toevoegen</h2>
+      </div>
+      <button class="close" onclick="closeInspectionModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="insp-form-label" id="insp-l-onderdeel" for="insp-f-onderdeel">Onderdeel</label>
+        <input type="text" id="insp-f-onderdeel" class="insp-form-input"
+          onkeydown="if(event.key==='Escape') closeInspectionModal();">
+      </div>
+      <div class="form-group">
+        <label class="insp-form-label" id="insp-l-bedrijf" for="insp-f-bedrijf">Keuringsbedrijf</label>
+        <input type="text" id="insp-f-bedrijf" class="insp-form-input">
+      </div>
+      <div class="form-group">
+        <label class="insp-form-label" id="insp-l-contact" for="insp-f-contact">Contactgegevens</label>
+        <textarea id="insp-f-contact" class="insp-form-input" rows="3"></textarea>
+      </div>
+      <div class="insp-form-dates">
+        <div class="form-group">
+          <label class="insp-form-label" id="insp-l-laatste" for="insp-f-laatste">Laatste keuring</label>
+          <input type="date" id="insp-f-laatste" class="insp-form-input">
+        </div>
+        <div class="form-group">
+          <label class="insp-form-label" id="insp-l-volgende" for="insp-f-volgende">Volgende keuring</label>
+          <input type="date" id="insp-f-volgende" class="insp-form-input">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="insp-form-label" id="insp-l-inplan" for="insp-f-inplan">Inplannen vanaf</label>
+        <input type="date" id="insp-f-inplan" class="insp-form-input">
+        <div class="insp-form-help" id="insp-l-inplan-help">Vanaf wanneer moet je de volgende keuring aanvragen?</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger insp-delete-btn" id="insp-delete-btn" style="display:none;" onclick="">Verwijderen</button>
+      <button class="btn-cancel" id="insp-cancel-btn" onclick="closeInspectionModal()">Annuleren</button>
+      <button class="btn-save" id="insp-save-btn" onclick="saveInspection()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH OVERLAY — full-screen lock until the user is signed in. Shown via
+     CSS class .show; the rest of the app is rendered behind it but hidden
+     by the backdrop until authentication completes. -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <h1>🏠 Huis van Bakkers</h1>
+      <p>Schoonmaakplan — gedeelde versie</p>
+    </div>
+    <div id="auth-loading" class="auth-loading">
+      <div class="auth-spinner"></div>
+      <p>Verbinden met server...</p>
+    </div>
+    <form class="auth-form" id="auth-form" style="display:none;" onsubmit="submitAuthForm();return false;">
+      <h2 id="auth-form-title">Inloggen</h2>
+      <p class="auth-form-sub" id="auth-form-sub">Log in om bij het gedeelde schoonmaakplan te komen</p>
+      <div class="form-group">
+        <label for="auth-email">E-mail</label>
+        <input type="email" id="auth-email" autocomplete="email" required>
+      </div>
+      <div class="form-group">
+        <label for="auth-password">Wachtwoord</label>
+        <input type="password" id="auth-password" autocomplete="current-password" required>
+      </div>
+      <div class="auth-error" id="auth-error" style="display:none;"></div>
+      <div class="auth-actions">
+        <button class="btn btn-primary" type="submit" id="auth-submit-btn">Inloggen</button>
+        <button class="btn-link" type="button" id="auth-toggle-mode" onclick="toggleAuthMode()">Nieuw account aanmaken</button>
+      </div>
+      <div class="auth-extra">
+        <button class="btn-link" type="button" onclick="sendPasswordReset()">Wachtwoord vergeten?</button>
+      </div>
+    </form>
+    <div class="auth-offline" id="auth-offline" style="display:none;">
+      <h2>⚠ Geen verbinding</h2>
+      <p>De cloud-server is niet bereikbaar. Je kunt de app in lokale modus gebruiken — afvinkingen worden alleen op dit apparaat opgeslagen en niet gedeeld.</p>
+      <button class="btn" onclick="continueOffline()">Lokaal doorgaan</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="qr-codes-modal" onclick="if(event.target===this) closeQrCodesModal()">
+  <div class="modal" style="max-width: 980px;">
+    <div class="modal-header">
+      <div>
+        <h2>🔲 <span id="qr-modal-title">QR-codes per ruimte</span></h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="qr-modal-subtitle">Print en plak op locatie — scannen opent direct de juiste filterview</div>
+      </div>
+      <button class="close" onclick="closeQrCodesModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="display: flex; gap: 12px; margin-bottom: 12px; align-items: center; flex-wrap: wrap;">
+        <label style="font-size: 13px; color: #475569;">
+          <span id="qr-mode-label">Genereer voor</span>:
+          <select id="qr-mode-select" onchange="renderQrCodesGrid()" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; margin-left: 6px;">
+            <option value="ruimte">Per ruimte</option>
+            <option value="werkplek">Per werkplek</option>
+          </select>
+        </label>
+        <button class="btn" onclick="printQrCodes()" id="qr-print-btn" style="margin-left: auto;">🖨 Print</button>
+      </div>
+      <div id="qr-codes-grid" class="qr-codes-grid"><!-- populated by renderQrCodesGrid --></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeQrCodesModal()" id="qr-close-btn">Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="user-modal" onclick="if(event.target===this) closeUserModal()">
+  <div class="modal" style="max-width: 460px;">
+    <div class="modal-header">
+      <div>
+        <h2>👤 <span id="user-modal-title">Wie ben jij?</span></h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="user-modal-subtitle">Je naam wordt vastgelegd bij elke afvinking</div>
+      </div>
+      <button class="close" onclick="closeUserModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="user-name-input" id="user-name-label">Jouw naam</label>
+        <input type="text" id="user-name-input" placeholder="bijv. Anna" maxlength="40" style="font-size: 16px; padding: 10px;">
+        <div style="font-size: 12px; color: #64748b; margin-top: 6px;" id="user-existing-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="setCurrentUser('')" id="user-anon-btn">Anoniem doorgaan</button>
+      <button class="btn-save" onclick="saveCurrentUser()" id="user-save-btn">Opslaan</button>
+    </div>
+    <div style="padding: 0 20px 16px; text-align: center;" id="user-signout-row">
+      <button class="btn-link" onclick="signOut()" id="user-signout-btn" style="font-size: 12px; color: #dc2626;">🚪 Uitloggen uit cloud-account</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="user-mgmt-modal" onclick="if(event.target===this) closeUserManagementModal()">
+  <div class="modal" style="max-width: 720px;">
+    <div class="modal-header">
+      <div>
+        <h2>🛡 Beheer accounts</h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;">Wijs rollen toe aan accounts. Alleen jij (super-user) ziet dit scherm.</div>
+      </div>
+      <button class="close" onclick="closeUserManagementModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="role-info-box">
+        <strong>Rollen uitgelegd:</strong>
+        <ul style="margin: 6px 0 0; padding-left: 22px; font-size: 13px;">
+          <li><strong>User</strong> — kan alleen taken afvinken</li>
+          <li><strong>Admin</strong> — kan ook taken bewerken/toevoegen/verwijderen, plannen importeren en wijzigingen doorvoeren in Versiebeheer</li>
+          <li><strong>Super-user</strong> — kan ook rollen toewijzen (alleen jij). Niet handmatig toewijsbaar — wordt automatisch toegekend aan het account met e-mail <code id="su-email-hint">SUPERUSER_EMAIL</code></li>
+        </ul>
+      </div>
+      <div id="user-mgmt-list"><!-- populated by renderUserManagementList --></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeUserManagementModal()">Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="help-modal" onclick="if(event.target===this) closeHelpModal()">
+  <div class="modal" style="max-width: 820px;">
+    <div class="modal-header">
+      <div>
+        <h2>ℹ️ Handleiding Schoonmaakplan</h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;">Uitleg over het gebruik, de waarden en hoe je taken beheert</div>
+      </div>
+      <button class="close" onclick="closeHelpModal()">×</button>
+    </div>
+    <div class="modal-body" id="help-modal-body"><!-- populated dynamically --></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeHelpModal()">Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="bulk-delete-modal" onclick="if(event.target===this) closeBulkDeleteModal()">
+  <div class="modal" style="max-width: 560px;">
+    <div class="modal-header modal-header-danger">
+      <div>
+        <h2 id="bulk-delete-modal-title">⚠ Geselecteerde taken verwijderen?</h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="bulk-delete-modal-subtitle"></div>
+      </div>
+      <button class="close" onclick="closeBulkDeleteModal()">×</button>
+    </div>
+    <div class="modal-body" id="bulk-delete-modal-body">
+      <!-- populated by openBulkDeleteModal() -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeBulkDeleteModal()">Annuleren</button>
+      <button class="btn-discard" onclick="confirmBulkDelete()" id="btn-bulk-delete-confirm">🗑 Ja, verwijderen</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="reset-modal" onclick="if(event.target===this) closeResetModal()">
+  <div class="modal" style="max-width: 520px;">
+    <div class="modal-header modal-header-danger">
+      <div>
+        <h2 id="reset-modal-title">⚠ Weet je zeker dat je alles wilt resetten?</h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="reset-modal-subtitle">Deze actie kan niet ongedaan worden gemaakt</div>
+      </div>
+      <button class="close" onclick="closeResetModal()">×</button>
+    </div>
+    <div class="modal-body" id="reset-modal-body">
+      <!-- populated by resetCurrentPeriod() -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeResetModal()" id="btn-reset-cancel">Annuleren</button>
+      <button class="btn-discard" onclick="confirmReset()" id="btn-reset-confirm">🗑 Ja, alles resetten</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="update-modal" onclick="if(event.target===this) closeUpdateModal()">
+  <div class="modal" style="max-width: 760px;">
+    <div class="modal-header">
+      <div>
+        <h2 id="update-modal-title">Wijzigingen doorvoeren naar Versiebeheer</h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="update-modal-subtitle">Controleer de wijzigingen en voeg toe aan de changelog</div>
+      </div>
+      <button class="close" onclick="closeUpdateModal()">×</button>
+    </div>
+    <div class="modal-body" id="update-modal-body">
+      <!-- populated by openUpdateModal() -->
+    </div>
+    <div class="modal-footer" id="update-modal-footer">
+      <button class="btn-cancel" onclick="cancelUpdate()" id="btn-cancel-update">Annuleren</button>
+      <button class="btn-save" onclick="commitUpdate()" id="btn-commit-update">Doorvoeren naar changelog</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" role="dialog" aria-modal="true" id="add-task-modal" onclick="if(event.target===this) closeAddTaskModal()">
+  <div class="modal" style="max-width: 720px;">
+    <div class="modal-header">
+      <div>
+        <h2 id="add-task-title">Nieuwe taak toevoegen</h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="add-task-subtitle">Vul de velden in om een nieuwe schoonmaaktaak toe te voegen</div>
+      </div>
+      <button class="close" onclick="closeAddTaskModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field">
+          <label id="lbl-add-ruimte">Ruimte <span class="required">*</span></label>
+          <input type="text" id="add-ruimte" list="suggest-ruimtes" autocomplete="off">
+          <datalist id="suggest-ruimtes"></datalist>
+        </div>
+        <div class="form-field">
+          <label id="lbl-add-werkplek">Werkplek</label>
+          <input type="text" id="add-werkplek" list="suggest-werkplek" autocomplete="off">
+          <datalist id="suggest-werkplek"></datalist>
+        </div>
+        <div class="form-field">
+          <label id="lbl-add-onderdeel">Onderdeel <span class="required">*</span></label>
+          <input type="text" id="add-onderdeel" autocomplete="off">
+        </div>
+        <div class="form-field">
+          <label id="lbl-add-onderdeel-en">Onderdeel (EN) <span class="optional-hint">optioneel</span></label>
+          <input type="text" id="add-onderdeel-en" autocomplete="off" placeholder="English translation">
+        </div>
+        <div class="form-field">
+          <label id="lbl-add-uitvoerend">Uitvoerend</label>
+          <select id="add-uitvoerend">
+            <option value="">—</option>
+            <option value="Facilitair">Facilitair</option>
+            <option value="Operator">Operator</option>
+            <option value="Extern schoonmaakbedrijf">Extern schoonmaakbedrijf</option>
+            <option value="Externe firma">Externe firma</option>
+          </select>
+        </div>
+        <div class="form-field full-width">
+          <label id="lbl-add-subcat">Taak / beschrijving <span class="required">*</span></label>
+          <textarea id="add-subcat"></textarea>
+        </div>
+        <div class="form-field full-width">
+          <label id="lbl-add-subcat-en">Taak / beschrijving (EN) <span class="optional-hint">optioneel</span></label>
+          <textarea id="add-subcat-en" placeholder="English translation"></textarea>
+        </div>
+        <div class="form-field full-width" id="add-image-field">
+          <label id="lbl-add-image">Afbeelding <span class="optional-hint">optioneel — admins/superusers</span></label>
+          <div class="image-upload-row">
+            <div class="image-upload-preview" id="add-image-preview">
+              <span class="image-upload-empty">Geen afbeelding</span>
+            </div>
+            <div class="image-upload-actions">
+              <input type="file" id="add-image-input" accept="image/*" style="display:none;">
+              <button type="button" class="btn" id="add-image-pick-btn" onclick="document.getElementById('add-image-input').click()">📷 Kies afbeelding</button>
+              <button type="button" class="btn btn-danger hidden" id="add-image-clear-btn" onclick="clearTaskImageInModal()">🗑 Verwijderen</button>
+              <span class="image-upload-status" id="add-image-status"></span>
+            </div>
+          </div>
+        </div>
+        <div class="form-field">
+          <label id="lbl-add-vervuiling">Type vervuiling</label>
+          <input type="text" id="add-vervuiling" placeholder="bijv. stof, aanslag, vet" autocomplete="off">
+        </div>
+        <div class="form-field">
+          <label id="lbl-add-wanneer">Wanneer</label>
+          <input type="text" id="add-wanneer" placeholder="bijv. Tijdens productie, 1x per dag" autocomplete="off">
+        </div>
+        <div class="form-field">
+          <label id="lbl-add-assigned-user">Toegewezen aan <span class="optional-hint">optioneel</span></label>
+          <input type="text" id="add-assigned-user" placeholder="naam — leeg = iedereen" autocomplete="off" list="known-users-datalist">
+          <datalist id="known-users-datalist"><!-- populated from state.allUsers + currentUser --></datalist>
+        </div>
+        <div class="form-field full-width">
+          <label><span id="lbl-add-scores">Risico-scores (optioneel)</span> <button type="button" class="info-btn" onclick="toggleScoreInfo()" title="Uitleg tonen" id="score-info-btn">?</button></label>
+          <div class="score-info-panel" id="score-info-panel" style="display: none;">
+            <div class="score-info-item">
+              <strong id="info-v-title">Vervuiling</strong>
+              <span id="info-v-text">hoe snel het onderdeel vervuild raakt (1 = nauwelijks, hogere waarde = sneller vuil)</span>
+            </div>
+            <div class="score-info-item">
+              <strong id="info-z-title">Zone</strong>
+              <span id="info-z-text">prioriteit/hygiënezone van de ruimte (hogere waarde = gevoeligere zone)</span>
+            </div>
+            <div class="score-info-item">
+              <strong id="info-a-title">Afstand</strong>
+              <span id="info-a-text">afstand tot het product (lagere waarde = dichter bij het product, kritischer)</span>
+            </div>
+            <div class="score-info-formula" id="info-formula">Samen bepalen deze de risico-score: V × Z × A. Hoe hoger de score, hoe belangrijker de taak.</div>
+          </div>
+          <div class="score-picker">
+            <div class="score-picker-row">
+              <span class="score-picker-label" id="lbl-add-vscore">Vervuiling</span>
+              <select id="add-vscore" onchange="updateScorePreview()"></select>
+            </div>
+            <div class="score-picker-row">
+              <span class="score-picker-label" id="lbl-add-zscore">Zone</span>
+              <select id="add-zscore" onchange="updateScorePreview()"></select>
+            </div>
+            <div class="score-picker-row">
+              <span class="score-picker-label" id="lbl-add-afstand">Afstand</span>
+              <select id="add-afstand" onchange="updateScorePreview()"></select>
+            </div>
+            <div class="score-picker-result">
+              <span class="score-picker-label" id="lbl-add-scoretotal">Score</span>
+              <div class="score-picker-total empty" id="add-score-display">—</div>
+            </div>
+          </div>
+          <div class="form-hint" id="hint-scores">Vervuilingscore × Zonescore × Afstand tot product. Alle drie nodig voor automatische berekening.</div>
+        </div>
+        <div class="form-field">
+          <label id="lbl-add-freq">Frequentie <span class="required">*</span></label>
+          <select id="add-freq">
+            <option value="daily">Dagelijks</option>
+            <option value="weekly">Wekelijks</option>
+            <option value="monthly">Maandelijks</option>
+            <option value="bimonthly">Elke 2 maanden</option>
+            <option value="quarterly">Per kwartaal</option>
+            <option value="semiannual">Halfjaarlijks</option>
+            <option value="annual">Jaarlijks</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label id="lbl-add-methode">Methode <span class="required">*</span></label>
+          <select id="add-methode"></select>
+          <div class="form-hint" id="hint-methode">Uit Methodieken-tab</div>
+        </div>
+        <div class="form-field full-width">
+          <label id="lbl-add-middel">Middel / hulpmiddel</label>
+          <select id="add-middel"></select>
+          <div class="form-hint" id="hint-middel">Uit Middelen-tab. Laat leeg als niet van toepassing.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeAddTaskModal()" id="btn-cancel-task">Annuleren</button>
+      <button class="btn-save" onclick="saveNewTask()" id="btn-save-task">Taak opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Floating "+ Task" button — only visible on mobile (CSS-controlled).
+     Opens the same Add Task modal as the desktop button in the filter bar. -->
+<button class="fab-add-task" id="fab-add-task" onclick="openAddTaskModal()" aria-label="Taak toevoegen" title="Taak toevoegen">
+  <span class="fab-icon" aria-hidden="true">+</span>
+</button>
+
+<div class="toast-container" id="toasts"></div>
+
+<!-- Centralised overdue overview — replaces per-row "Achterstand" text labels.
+     Shown only when the user clicks the "⚠ Achterstand" button in the tabs row.
+     Contents are populated by renderOverdueOverviewModal() before opening. -->
+<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="overdue-modal-title" id="overdue-modal" onclick="if(event.target===this) closeOverdueOverviewModal()">
+  <div class="modal" style="max-width: 720px;">
+    <div class="modal-header" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white;">
+      <div>
+        <h2 id="overdue-modal-title">⚠ <span id="overdue-modal-title-text"></span></h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="overdue-modal-subtitle"></div>
+      </div>
+      <button class="close" onclick="closeOverdueOverviewModal()" aria-label="Sluiten">×</button>
+    </div>
+    <div class="modal-body" id="overdue-modal-body">
+      <!-- Filled by renderOverdueOverviewModal() -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeOverdueOverviewModal()" id="btn-overdue-close">Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<!-- In-screen sign-out confirmation modal (replaces browser confirm dialog) -->
+<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="signout-modal-title" id="signout-modal" onclick="if(event.target===this) closeSignOutModal()">
+  <div class="modal" style="max-width: 460px;">
+    <div class="modal-header modal-header-danger">
+      <div>
+        <h2 id="signout-modal-title">🚪 Uitloggen?</h2>
+        <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;" id="signout-modal-subtitle">Bevestig om de cloud-sessie te beëindigen</div>
+      </div>
+      <button class="close" onclick="closeSignOutModal()" aria-label="Sluiten">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin: 0; line-height: 1.5; color: #475569;">
+        Je gaat uitloggen uit het cloud-account. Je moet opnieuw inloggen om bij de gedeelde data te komen.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeSignOutModal()" id="btn-signout-cancel">Annuleren</button>
+      <button class="btn-discard" onclick="confirmSignOut()" id="btn-signout-confirm">🚪 Ja, uitloggen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Check-note modal — shown when user clicks the 💬 / + button on a check -->
+<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="note-modal-title" id="note-modal" onclick="if(event.target===this) closeNoteModal()">
+  <div class="modal" style="max-width: 480px;">
+    <div class="modal-header">
+      <div>
+        <h2 id="note-modal-title">💬 <span id="note-modal-title-text"></span></h2>
+        <div style="font-size: 12px; opacity: 0.75; margin-top: 2px;" id="note-modal-subtitle"></div>
+      </div>
+      <button class="close" onclick="closeNoteModal()" aria-label="Sluiten">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field full-width">
+        <label id="note-modal-label" for="note-modal-input"></label>
+        <textarea id="note-modal-input" rows="4" maxlength="500"
+          placeholder="bijv. Machine was deels uit productie, alleen buitenkant schoongemaakt."
+          style="resize: vertical; font-size: 14px;"></textarea>
+        <div style="font-size: 11px; color: #94a3b8; text-align: right; margin-top: 4px;">
+          <span id="note-modal-chars">0</span> / 500
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeNoteModal()" id="note-modal-cancel">Annuleren</button>
+      <button class="btn-discard" id="note-modal-clear" onclick="saveCheckNote('')" style="background:#f1f5f9; color:#dc2626; border-color:#fca5a5;">🗑 Opmerking wissen</button>
+      <button class="btn-primary" onclick="saveCheckNote()" id="note-modal-save">💾 Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js?v=20260616110526"></script>
+</body>
+</html>
